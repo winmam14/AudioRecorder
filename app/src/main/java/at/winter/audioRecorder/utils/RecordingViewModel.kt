@@ -1,9 +1,8 @@
 package at.winter.audioRecorder.utils
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.room.PrimaryKey
 import at.winter.audioRecorder.data.Recording
 import at.winter.audioRecorder.data.RecordingDao
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -14,7 +13,8 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.io.File
+
+const val TAG = "RecordingViewModel"
 
 class RecordingViewModel(
     private val dao: RecordingDao
@@ -41,19 +41,23 @@ class RecordingViewModel(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), RecordingState())
 
     fun onEvent(event: RecordingEvent){
+        Log.i(TAG, event.toString())
         when(event){
             is RecordingEvent.SortRecordings -> {
                 _sortType.value = event.sortType
             }
 
             is RecordingEvent.StopRecording -> {
-                val name = state.value.name
-                val size = state.value.size
-                val file = state.value.file
-                val duration = state.value.duration
-                val unixTimestamp = state.value.unixTimestamp
+                val name = event.recording.name
+                val size = event.recording.size
+                val file = event.recording.file
+                val duration = event.recording.duration
+                val unixTimestamp = event.recording.unixTimestamp
 
-                if (name.isBlank() || size <= 0 || file.isEmpty() || duration <= 0 || unixTimestamp <= 0){
+                if (name.isBlank() || size < 0 || file.isEmpty() || duration <= 0 || unixTimestamp <= 0){
+                    _state.update { it.copy(
+                        isRecording = false
+                    ) }
                     return
                 }
 

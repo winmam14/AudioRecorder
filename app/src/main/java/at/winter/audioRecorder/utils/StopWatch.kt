@@ -18,11 +18,12 @@ import java.util.Locale
 
 class StopWatch {
     var formattedTime by mutableStateOf("00:00:000")
+    var timeMillis = 0L
+    private set
 
     private var coroutineScope = CoroutineScope(Dispatchers.Main)
     private var isActive = false
 
-    private var timeMillis = 0L
     private var lastTimestamp = 0L
 
     fun start(){

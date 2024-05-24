@@ -5,13 +5,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import at.winter.audioRecorder.screens.*
+import at.winter.audioRecorder.utils.RecordingEvent
+import at.winter.audioRecorder.utils.RecordingState
 
 @Composable
-fun Navigation(){
+fun Navigation(state: RecordingState, onEvent: (RecordingEvent) -> Unit){
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = Screen.MainScreen.route){
         composable(route = Screen.MainScreen.route){
-            MainScreen { navController.navigate(Screen.RecordingsScreen.route) }
+            MainScreen(state = state, onEvent = onEvent, onOpenRecordings = { navController.navigate(Screen.RecordingsScreen.route) })
         }
         composable(route = Screen.RecordingsScreen.route){
             RecordingsScreen()

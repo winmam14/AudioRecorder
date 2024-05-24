@@ -1,7 +1,6 @@
 package at.winter.audioRecorder.utils
 
 import at.winter.audioRecorder.data.Recording
-import java.io.File
 
 data class RecordingState (
     val recordings: List<Recording> = emptyList(),

@@ -1,7 +1,5 @@
 package at.winter.audioRecorder.screens
 
-import android.content.Context
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.spring
@@ -10,15 +8,11 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LargeFloatingActionButton
 import androidx.compose.material3.MaterialTheme
@@ -26,9 +20,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -37,6 +29,8 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import at.winter.audioRecorder.R
 import at.winter.audioRecorder.utils.AudioRecorder.AndroidAudioRecordHandler
+import at.winter.audioRecorder.utils.RecordingEvent
+import at.winter.audioRecorder.utils.RecordingState
 import at.winter.audioRecorder.utils.StopWatch
 import java.util.Timer
 import kotlin.concurrent.schedule
@@ -44,9 +38,8 @@ import kotlin.concurrent.schedule
 const val TAG = "MainScreen"
 
 @Composable
-fun MainScreen(onOpenRecordings: () -> Unit) {
+fun MainScreen(onOpenRecordings: () -> Unit, state: RecordingState, onEvent: (RecordingEvent) -> Unit) {
     val applicationContext = LocalContext.current
-    var recordingStarted by remember { mutableStateOf(false) }
 
     val recorder = remember {
         AndroidAudioRecordHandler(applicationContext)
@@ -55,17 +48,16 @@ fun MainScreen(onOpenRecordings: () -> Unit) {
     Box {
 
         RecordElement(
-            recordingStarted = recordingStarted,
-            onClick = {
-                recordingStarted = !recordingStarted
-                recorder.toggle()
+            recordingStarted = state.isRecording,
+            onClick = {duration ->
+                onEvent(recorder.toggle(duration, state.isRecording))
             },
             modifier = Modifier
                 .align(Alignment.Center)
         )
 
         AnimatedVisibility(
-            visible = !recordingStarted,
+            visible = !state.isRecording,
             enter = scaleIn() + fadeIn(),
             exit = scaleOut() + fadeOut(),
             modifier = Modifier
@@ -94,7 +86,7 @@ fun MainScreen(onOpenRecordings: () -> Unit) {
 }
 
 @Composable
-fun RecordElement(recordingStarted: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun RecordElement(recordingStarted: Boolean, onClick: (time: Long) -> Unit, modifier: Modifier = Modifier) {
     val stopWatch = remember { StopWatch() }
     val transition = updateTransition(targetState = recordingStarted, label = "boxTransition")
     val scale by transition.animateFloat(
@@ -126,11 +118,11 @@ fun RecordElement(recordingStarted: Boolean, onClick: () -> Unit, modifier: Modi
                 if (recordingStarted) {
                     stopWatch.pause()
                     Timer().schedule(1000L) {
-                        onClick()
+                        onClick(stopWatch.timeMillis)
                         stopWatch.reset()
                     }
                 } else {
-                    onClick()
+                    onClick(stopWatch.timeMillis)
                     stopWatch.start()
                 }
             },

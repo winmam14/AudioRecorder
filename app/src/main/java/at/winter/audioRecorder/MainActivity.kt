@@ -4,20 +4,43 @@ import android.Manifest
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.room.Room
+import at.winter.audioRecorder.data.RecordingDatabase
 import at.winter.audioRecorder.navigation.Navigation
 import at.winter.audioRecorder.ui.theme.AudioRecorderTheme
+import at.winter.audioRecorder.utils.RecordingViewModel
 
 class MainActivity : ComponentActivity() {
+
+    private val db by lazy {
+        Room.databaseBuilder(
+            applicationContext,
+            RecordingDatabase::class.java,
+            "recordings.db"
+        ).build()
+    }
+    private val viewModel by viewModels<RecordingViewModel>(
+        factoryProducer = {
+            object : ViewModelProvider.Factory {
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return RecordingViewModel(db.dao) as T
+                }
+            }
+        }
+    )
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO),0)
+        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO), 0)
         super.onCreate(savedInstanceState)
         setContent {
             AudioRecorderTheme {
@@ -25,17 +48,18 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    Navigation()
+                    val state by viewModel.state.collectAsState()
+                    Navigation(state = state, onEvent = viewModel::onEvent)
                 }
             }
         }
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    AudioRecorderTheme {
-        Navigation()
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun GreetingPreview() {
+//    AudioRecorderTheme {
+//        Navigation()
+//    }
+//}

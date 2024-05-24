@@ -2,36 +2,44 @@ package at.winter.audioRecorder.utils.AudioRecorder
 
 import android.content.Context
 import android.util.Log
+import at.winter.audioRecorder.data.Recording
+import at.winter.audioRecorder.utils.RecordingEvent
 import java.io.File
 
 const val TAG = "AndroidAudioRecordHandler"
 
-enum class ActiveState{
-    INACTIVE, ACTIVE
-}
-
-class AndroidAudioRecordHandler(private var applicationContext: Context){
-    private var state: ActiveState = ActiveState.INACTIVE
+class AndroidAudioRecordHandler(private var applicationContext: Context) {
     private var recorder: AndroidAudioRecorder = AndroidAudioRecorder(applicationContext)
+    private var file: File? = null
 
-    fun toggle(){
-        when(state){
-            ActiveState.ACTIVE -> {
-                Log.i(TAG, "Stop Recording...")
-                state = ActiveState.INACTIVE
-                recorder.stop()
+    fun toggle(durationMs: Long, isRecording: Boolean): RecordingEvent {
+        if (isRecording) {
+            Log.i(TAG, "Stop Recording...")
+            recorder.stop()
+            return if (file != null) {
+                RecordingEvent.StopRecording(
+                    Recording(
+                        name = file!!.name,
+                        size = file!!.readBytes().size,
+                        file = file!!.readBytes(),
+                        duration = durationMs,
+                        unixTimestamp = System.currentTimeMillis()
+                    )
+                )
+            } else {
+                RecordingEvent.StopRecording(Recording("", 0, ByteArray(0), 0L, 0L))
             }
-            ActiveState.INACTIVE -> {
-                Log.i(TAG, "Start Recording...")
-                state = ActiveState.ACTIVE
-                recorder.start(createFile())
-            }
+        } else {
+            Log.i(TAG, "Start Recording...")
+            file = createFile()
+            recorder.start(file!!)
+            return RecordingEvent.StartRecording
         }
     }
 
-    private fun createFile(): File {
-        val filename = "record_${System.currentTimeMillis()}.mp3"
-        Log.i(TAG, "Create cache file with name: $filename")
-        return File(applicationContext.cacheDir, filename)
-    }
+private fun createFile(): File {
+    val filename = "record_${System.currentTimeMillis()}.mp3"
+    Log.i(TAG, "Create cache file with name: $filename")
+    return File(applicationContext.cacheDir, filename)
+}
 }
