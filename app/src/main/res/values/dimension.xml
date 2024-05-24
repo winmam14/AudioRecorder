@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="outline_padding">16.dp</dimen>
+    <dimen name="small_padding">8.dp</dimen>
+    <dimen name="medium_padding">16.dp</dimen>
+    <dimen name="large_padding">32.dp</dimen>
+    <dimen name="extra_large_padding">128.dp</dimen>
+    <dimen name="record_button_icon_size">32.dp</dimen>
+    <dimen name="stop_record_button_size">64.dp</dimen>
+    <dimen name="record_button_size">128.dp</dimen>
+</resources>
