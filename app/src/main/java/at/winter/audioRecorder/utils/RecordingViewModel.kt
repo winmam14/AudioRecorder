@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-const val TAG = "RecordingViewModel"
+private val TAG = "RecordingViewModel"
 
 class RecordingViewModel(
     private val dao: RecordingDao
@@ -87,13 +87,29 @@ class RecordingViewModel(
 
             RecordingEvent.StartRecording -> {
                 _state.update { it.copy(
-                    isRecording = true
+                    isRecording = true,
+                    isReplaying = false
                 ) }
             }
 
             is RecordingEvent.StartReplay -> {
-                event.audioPlayer.playMedia(event.recording.file)
+                _state.update { it.copy(
+                    isReplaying = true,
+                    currentRecording = event.id
+                ) }
+                event.audioPlayer.playMedia(event.file)
             }
+
+            is RecordingEvent.StopReplay -> {
+                _state.update { it.copy(
+                    isReplaying = false,
+                    currentRecording = 0
+                ) }
+                event.audioPlayer.stop()
+            }
+
+
+
         }
     }
 }

@@ -6,7 +6,7 @@ import at.winter.audioRecorder.data.Recording
 import at.winter.audioRecorder.utils.RecordingEvent
 import java.io.File
 
-const val TAG = "AndroidAudioRecordHandler"
+private val TAG = "AndroidAudioRecordHandler"
 
 class AndroidAudioRecordHandler(private var applicationContext: Context) {
     private var recorder: AndroidAudioRecorder = AndroidAudioRecorder(applicationContext)
@@ -17,15 +17,15 @@ class AndroidAudioRecordHandler(private var applicationContext: Context) {
             Log.i(TAG, "Stop Recording...")
             recorder.stop()
             return if (file != null) {
-                RecordingEvent.StopRecording(
-                    Recording(
-                        name = file!!.name,
-                        size = file!!.readBytes().size,
-                        file = file!!.readBytes(),
-                        duration = durationMs,
-                        unixTimestamp = System.currentTimeMillis()
-                    )
+                val recording = Recording(
+                    name = file!!.name,
+                    size = file!!.readBytes().size,
+                    file = file!!.readBytes(),
+                    duration = durationMs,
+                    unixTimestamp = System.currentTimeMillis()
                 )
+                file!!.delete()
+                RecordingEvent.StopRecording(recording)
             } else {
                 RecordingEvent.StopRecording(Recording("", 0, ByteArray(0), 0L, 0L))
             }
@@ -37,9 +37,9 @@ class AndroidAudioRecordHandler(private var applicationContext: Context) {
         }
     }
 
-private fun createFile(): File {
-    val filename = "record_${System.currentTimeMillis()}.mp3"
-    Log.i(TAG, "Create cache file with name: $filename")
-    return File(applicationContext.cacheDir, filename)
-}
+    private fun createFile(): File {
+        val filename = "record_${System.currentTimeMillis()}.mp3"
+        Log.i(TAG, "Create cache file with name: $filename")
+        return File(applicationContext.cacheDir, filename)
+    }
 }

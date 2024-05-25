@@ -21,13 +21,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import at.winter.audioRecorder.R
 import at.winter.audioRecorder.data.Recording
-import at.winter.audioRecorder.utils.AudioPlayer.AndroidAudioPlayer
+import at.winter.audioRecorder.utils.AudioPlayer.AndroidAudioPlayerHandler
 import at.winter.audioRecorder.utils.RecordingEvent
 import at.winter.audioRecorder.utils.RecordingState
 import at.winter.audioRecorder.utils.SimpleDateFormatter
@@ -37,9 +38,10 @@ import at.winter.audioRecorder.utils.SortType
 fun RecordingsScreen(state: RecordingState, onEvent: (RecordingEvent) -> Unit) {
     val applicationContext = LocalContext.current
 
-    val audioPlayer by lazy {
-        AndroidAudioPlayer(context = applicationContext)
+    val audioPlayer = remember {
+        AndroidAudioPlayerHandler(applicationContext)
     }
+
 
     LazyColumn(
         contentPadding = PaddingValues(dimensionResource(id = R.dimen.medium_padding)),
@@ -72,11 +74,7 @@ fun RecordingsScreen(state: RecordingState, onEvent: (RecordingEvent) -> Unit) {
             RecordingItem(
                 recording = recording,
                 onStartReplay = {
-                    onEvent(
-                        RecordingEvent.StartReplay(
-                            recording = recording, audioPlayer = audioPlayer
-                        )
-                    )
+                    onEvent(audioPlayer.toggle(state.isReplaying, state.currentRecording, recording))
                 },
                 onDeleteRecording = {
                     onEvent(RecordingEvent.DeleteRecording(recording = recording))

@@ -35,7 +35,7 @@ import at.winter.audioRecorder.utils.StopWatch
 import java.util.Timer
 import kotlin.concurrent.schedule
 
-const val TAG = "MainScreen"
+private val TAG = "MainScreen"
 
 @Composable
 fun MainScreen(onOpenRecordings: () -> Unit, state: RecordingState, onEvent: (RecordingEvent) -> Unit) {

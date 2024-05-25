@@ -1,6 +1,8 @@
 package at.winter.audioRecorder.utils.AudioPlayer
 
+import java.io.File
+
 interface AudioPlayer {
-    fun playMedia(media: ByteArray)
+    fun playMedia(file: File)
     fun stop()
 }
