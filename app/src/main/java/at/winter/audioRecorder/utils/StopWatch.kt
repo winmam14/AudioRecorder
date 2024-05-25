@@ -1,6 +1,5 @@
 package at.winter.audioRecorder.utils
 
-import android.os.Build
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -9,12 +8,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.util.Date
-import java.util.Locale
 
 class StopWatch {
     var formattedTime by mutableStateOf("00:00:000")
@@ -36,7 +29,7 @@ class StopWatch {
                 delay(25L)
                 timeMillis += System.currentTimeMillis() - lastTimestamp
                 lastTimestamp = System.currentTimeMillis()
-                formattedTime = formatTime(timeMillis)
+                formattedTime = SimpleDateFormatter.formatTime(timeMillis, "mm:ss:SSS")
             }
         }
     }
@@ -52,19 +45,5 @@ class StopWatch {
         lastTimestamp = 0L
         formattedTime = "00:00:000"
         isActive = false
-    }
-
-    private fun formatTime(timeMillis: Long): String{
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val localDateTime =
-                LocalDateTime.ofInstant(
-                    Instant.ofEpochMilli(timeMillis),
-                    ZoneId.systemDefault()
-                )
-            val formatter = DateTimeFormatter.ofPattern("mm:ss:SSS", Locale.getDefault())
-            localDateTime.format(formatter)
-        } else {
-            Date(timeMillis).toLocaleString()
-        }
     }
 }

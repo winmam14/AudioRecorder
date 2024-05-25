@@ -90,6 +90,10 @@ class RecordingViewModel(
                     isRecording = true
                 ) }
             }
+
+            is RecordingEvent.StartReplay -> {
+                event.audioPlayer.playMedia(event.recording.file)
+            }
         }
     }
 }

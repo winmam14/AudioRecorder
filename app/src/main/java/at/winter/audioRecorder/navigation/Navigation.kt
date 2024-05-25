@@ -16,7 +16,7 @@ fun Navigation(state: RecordingState, onEvent: (RecordingEvent) -> Unit){
             MainScreen(state = state, onEvent = onEvent, onOpenRecordings = { navController.navigate(Screen.RecordingsScreen.route) })
         }
         composable(route = Screen.RecordingsScreen.route){
-            RecordingsScreen()
+            RecordingsScreen(state = state, onEvent = onEvent)
         }
 
     }
