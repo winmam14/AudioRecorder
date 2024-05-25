@@ -19,9 +19,10 @@ private val TAG = "RecordingViewModel"
 class RecordingViewModel(
     private val dao: RecordingDao
 ): ViewModel(){
-    private val _sortType = MutableStateFlow(SortType.TIMESTAMP_DESC)
+    private val sortType = MutableStateFlow(SortType.TIMESTAMP_DESC)
+
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val _recordings = _sortType
+    private val recordings = sortType
         .flatMapLatest { sortType ->
             when(sortType){
                 SortType.TIMESTAMP_ASC -> dao.getRecordsOrderedByTimeStampAsc()
@@ -32,7 +33,7 @@ class RecordingViewModel(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
     private val _state = MutableStateFlow(RecordingState())
 
-    val state = combine(_state, _sortType, _recordings){ state, sortType, contacts ->
+    val state = combine(_state, sortType, recordings){ state, sortType, contacts ->
         state.copy(
             recordings = contacts,
             sortType = sortType
@@ -44,7 +45,7 @@ class RecordingViewModel(
         Log.i(TAG, event.toString())
         when(event){
             is RecordingEvent.SortRecordings -> {
-                _sortType.value = event.sortType
+                sortType.value = event.sortType
             }
 
             is RecordingEvent.StopRecording -> {
@@ -107,9 +108,6 @@ class RecordingViewModel(
                 ) }
                 event.audioPlayer.stop()
             }
-
-
-
         }
     }
 }
