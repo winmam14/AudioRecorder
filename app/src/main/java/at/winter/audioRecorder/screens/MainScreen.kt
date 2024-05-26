@@ -6,7 +6,6 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -17,7 +16,6 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,7 +23,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LargeFloatingActionButton
 import androidx.compose.material3.MaterialTheme
@@ -37,7 +34,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -70,6 +66,7 @@ fun MainScreen(
     var showSnackbar by remember {
         mutableStateOf(false)
     }
+
 
     Box {
         RecordElement(
@@ -160,10 +157,13 @@ fun RecordElement(
     ) { isRecording ->
         if (isRecording) 0.6f else 1f
     }
-
+    var recordPermissionAllowed by remember {
+        mutableStateOf(false)
+    }
     val recordingPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { isGranted ->
+            recordPermissionAllowed = isGranted
             Log.i(TAG, "Permission granted: $isGranted")
             if (isGranted) {
                 stopWatch.start()
@@ -173,6 +173,8 @@ fun RecordElement(
             }
         }
     )
+
+
 
     Box(modifier = modifier) {
         AnimatedVisibility(
@@ -199,7 +201,12 @@ fun RecordElement(
                         stopWatch.reset()
                     }
                 } else {
-                    recordingPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                    if (!recordPermissionAllowed){
+                        recordingPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                    } else {
+                        stopWatch.start()
+                        onClick(stopWatch.timeMillis)
+                    }
                 }
             },
             shape = CircleShape,
