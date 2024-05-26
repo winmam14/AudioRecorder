@@ -1,6 +1,5 @@
 package at.winter.audioRecorder.utils
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import at.winter.audioRecorder.data.Recording
@@ -42,7 +41,6 @@ class RecordingViewModel(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), RecordingState())
 
     fun onEvent(event: RecordingEvent){
-        Log.i(TAG, event.toString())
         when(event){
             is RecordingEvent.SortRecordings -> {
                 sortType.value = event.sortType

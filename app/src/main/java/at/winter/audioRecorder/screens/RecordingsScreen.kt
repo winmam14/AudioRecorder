@@ -15,7 +15,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -28,7 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import at.winter.audioRecorder.R
 import at.winter.audioRecorder.data.Recording
 import at.winter.audioRecorder.utils.AudioPlayer.AndroidAudioPlayerHandler
@@ -55,11 +53,11 @@ fun RecordingsScreen(state: RecordingState, onEvent: (RecordingEvent) -> Unit) {
     ) {
         item {
             Text(
-                stringResource(id = R.string.recordings_page_title),
+                stringResource(id = R.string.recordings_screen_title),
                 style = MaterialTheme.typography.titleLarge
             )
             Text(
-                stringResource(id = R.string.recordings_page_description),
+                stringResource(id = R.string.recordings_screen_description),
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.padding(
                     bottom = dimensionResource(
