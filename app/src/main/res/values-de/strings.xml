@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Audio Rekorder</string>
+    <string name="show_recordings">Aufnahmen anzeigen</string>
+    <string name="permission_snackbar">"Bitte erteilen Sie die Erlaubnis zur Audioaufnahme "</string>
+    <string name="grant_permission">Erlaubnis erteilen</string>
+    <string name="sort_timestamp_newest">Neueste</string>
+    <string name="sort_timestamp_oldest">Älteste</string>
+    <string name="sort_size">Größe</string>
+    <string name="recordings_page_description">Auf dieser Seite haben Sie eine Liste Ihrer Aufnahmen und können diese wiedergeben oder löschen.</string>
+    <string name="recordings_page_title">Archiv</string>
+    <string name="recording_item_attribute_size">Größe:</string>
+    <string name="recording_item_attribute_duration">Dauer:</string>
+    <string name="recording_item_attribute_date">Datum:</string>
+    <string name="order_by">Sortieren:</string>
+</resources>

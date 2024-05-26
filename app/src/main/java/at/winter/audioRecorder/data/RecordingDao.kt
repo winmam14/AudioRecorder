@@ -21,7 +21,7 @@ interface RecordingDao {
     @Query("SELECT * FROM recordings ORDER BY unixTimestamp DESC")
     fun getRecordsOrderedByTimeStampDesc(): Flow<List<Recording>>
 
-    @Query("SELECT * FROM recordings ORDER BY size")
+    @Query("SELECT * FROM recordings ORDER BY size DESC")
     fun getRecordsOrderedBySize(): Flow<List<Recording>>
 
 }

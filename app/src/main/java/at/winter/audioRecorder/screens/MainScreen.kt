@@ -41,6 +41,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import at.winter.audioRecorder.R
 import at.winter.audioRecorder.utils.AudioRecorder.AndroidAudioRecordHandler
 import at.winter.audioRecorder.utils.RecordingEvent
@@ -69,6 +70,22 @@ fun MainScreen(
 
 
     Box {
+
+        AnimatedVisibility(
+            visible = !state.isRecording,
+            enter = scaleIn() + fadeIn(),
+            exit = scaleOut() + fadeOut(),
+            modifier = Modifier
+                .align(Alignment.Center)
+                .padding(
+                    bottom = dimensionResource(id = R.dimen.record_button_size) + dimensionResource(
+                        id = R.dimen.extra_large_padding
+                    )
+                )
+        ) {
+            Text("Start recording!", style = MaterialTheme.typography.displayMedium)
+        }
+
         RecordElement(
             recordingStarted = state.isRecording,
             onPermissionDenied = {
@@ -103,7 +120,7 @@ fun MainScreen(
                     .wrapContentSize()
 
             ) {
-                Text("Show Records", style = MaterialTheme.typography.labelLarge)
+                Text(stringResource(id = R.string.show_recordings), style = MaterialTheme.typography.labelLarge)
             }
         }
 
@@ -128,14 +145,14 @@ fun MainScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                 ) {
-                    Text("Please grant recording permission to use this feature ", modifier = Modifier.weight(1f))
+                    Text(stringResource(id = R.string.permission_snackbar), modifier = Modifier.weight(1f))
                     TextButton(onClick = {
                         Intent(
                             Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
                             Uri.fromParts("package", "at.winter.audioRecorder", null)
                         ).also { activity.startActivity(it) }
                     }) {
-                        Text("Grant Permission")
+                        Text(stringResource(id = R.string.grant_permission))
                     }
                 }
             }

@@ -15,6 +15,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -26,6 +27,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import at.winter.audioRecorder.R
 import at.winter.audioRecorder.data.Recording
 import at.winter.audioRecorder.utils.AudioPlayer.AndroidAudioPlayerHandler
@@ -51,6 +54,20 @@ fun RecordingsScreen(state: RecordingState, onEvent: (RecordingEvent) -> Unit) {
         )
     ) {
         item {
+            Text(
+                stringResource(id = R.string.recordings_page_title),
+                style = MaterialTheme.typography.titleLarge
+            )
+            Text(
+                stringResource(id = R.string.recordings_page_description),
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(
+                    bottom = dimensionResource(
+                        id = R.dimen.large_padding
+                    )
+                )
+            )
+            Text(text = stringResource(id = R.string.order_by))
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -65,7 +82,7 @@ fun RecordingsScreen(state: RecordingState, onEvent: (RecordingEvent) -> Unit) {
                     ) {
                         RadioButton(selected = state.sortType == sortType,
                             onClick = { onEvent(RecordingEvent.SortRecordings(sortType)) })
-                        Text(text = sortType.name)
+                        Text(text = stringResource(id = sortType.resourceID))
                     }
                 }
             }
@@ -74,7 +91,13 @@ fun RecordingsScreen(state: RecordingState, onEvent: (RecordingEvent) -> Unit) {
             RecordingItem(
                 recording = recording,
                 onStartReplay = {
-                    onEvent(audioPlayer.toggle(state.isReplaying, state.currentRecording, recording))
+                    onEvent(
+                        audioPlayer.toggle(
+                            state.isReplaying,
+                            state.currentRecording,
+                            recording
+                        )
+                    )
                 },
                 onDeleteRecording = {
                     onEvent(RecordingEvent.DeleteRecording(recording = recording))
@@ -98,20 +121,22 @@ fun RecordingItem(recording: Recording, onStartReplay: () -> Unit, onDeleteRecor
                 .clickable {
                     onStartReplay()
                 }) {
-                Text(recording.name, style = MaterialTheme.typography.titleMedium)
+                Text(recording.name, style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(bottom = dimensionResource(
+                    id = R.dimen.small_padding
+                )))
                 Text(
-                    "Size: ${recording.size / 1024}kB", style = MaterialTheme.typography.bodySmall
+                    stringResource(id = R.string.recording_item_attribute_size) + String.format(" %.2f kb",recording.size / 1024.0), style = MaterialTheme.typography.bodyMedium
                 )
                 Text(
-                    text = "Duration: ${recording.duration / 1000}sec",
-                    style = MaterialTheme.typography.bodySmall
+                    text = stringResource(id = R.string.recording_item_attribute_duration) + String.format(" %.2f sec",recording.duration / 1000.0),
+                    style = MaterialTheme.typography.bodyMedium
                 )
                 Text(
-                    text = "Date: ${
+                    text = stringResource(id = R.string.recording_item_attribute_date) + " ${
                         SimpleDateFormatter.formatTime(
                             recording.unixTimestamp, "YYYY-MM-dd HH:mm"
                         )
-                    }", style = MaterialTheme.typography.bodySmall
+                    }", style = MaterialTheme.typography.bodyMedium
                 )
 
             }

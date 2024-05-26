@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">Audio Recorder</string>
+    <string name="show_recordings">Show recordings</string>
+    <string name="permission_snackbar">"Please grant permission to record audio "</string>
+    <string name="grant_permission">Grant permission</string>
+    <string name="sort_timestamp_newest">Newest</string>
+    <string name="sort_timestamp_oldest">Oldest</string>
+    <string name="sort_size">Size</string>
+    <string name="recordings_page_description">On this page you have a list of your recordings and can replay or delete your them.</string>
+    <string name="recordings_page_title">Archive</string>
+    <string name="recording_item_attribute_size">Size:</string>
+    <string name="recording_item_attribute_duration">Duration:</string>
+    <string name="recording_item_attribute_date">Date:</string>
+    <string name="order_by">Order by:</string>
 </resources>

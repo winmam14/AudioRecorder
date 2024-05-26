@@ -18,7 +18,7 @@ class AndroidAudioRecordHandler(private var applicationContext: Context) {
             recorder.stop()
             return if (file != null) {
                 val recording = Recording(
-                    name = file!!.name,
+                    name = file!!.nameWithoutExtension,
                     size = file!!.readBytes().size,
                     file = file!!.readBytes(),
                     duration = durationMs,
@@ -38,7 +38,7 @@ class AndroidAudioRecordHandler(private var applicationContext: Context) {
     }
 
     private fun createFile(): File {
-        val filename = "record_${System.currentTimeMillis()}.mp3"
+        val filename = "R${System.currentTimeMillis()}.mp3"
         Log.i(TAG, "Create cache file with name: $filename")
         return File(applicationContext.cacheDir, filename)
     }
