@@ -42,6 +42,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import at.winter.audioRecorder.R
 import at.winter.audioRecorder.utils.AudioRecorder.AndroidAudioRecordHandler
 import at.winter.audioRecorder.utils.RecordingEvent
@@ -83,7 +84,7 @@ fun MainScreen(
                     )
                 )
         ) {
-            Text("Start recording!", style = MaterialTheme.typography.displayMedium)
+            Text(stringResource(id = R.string.main_screen_title), style = MaterialTheme.typography.displaySmall, textAlign = TextAlign.Center)
         }
 
         RecordElement(
@@ -239,6 +240,7 @@ fun RecordElement(
                     dimensionResource(id = R.dimen.record_button_icon_size)
                 )
             )
+
         }
     }
 }

@@ -12,4 +12,5 @@
     <string name="recording_item_attribute_duration">Duration:</string>
     <string name="recording_item_attribute_date">Date:</string>
     <string name="order_by">Order by:</string>
+    <string name="main_screen_title">Start recording!</string>
 </resources>

@@ -13,4 +13,5 @@
     <string name="recording_item_attribute_duration">Dauer:</string>
     <string name="recording_item_attribute_date">Datum:</string>
     <string name="order_by">Sortieren:</string>
+    <string name="main_screen_title">Starte eine Aufnahme!</string>
 </resources>
