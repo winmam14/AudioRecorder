@@ -73,4 +73,5 @@ dependencies {
     val roomVersion = "2.6.1"
     implementation("androidx.room:room-ktx:$roomVersion")
     ksp("androidx.room:room-compiler:$roomVersion")
+    implementation("androidx.compose.ui:ui-text-google-fonts:1.6.7")
 }
