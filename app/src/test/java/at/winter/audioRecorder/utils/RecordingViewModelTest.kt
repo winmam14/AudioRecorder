@@ -62,8 +62,26 @@ class RecordingViewModelTest{
         viewModel.onEvent(RecordingEvent.StopRecording(recording))
         state = viewModel.state.first()
         assertEquals(state.isRecording, false)
-        println(testDouble.getRecordsOrderedBySize().first().size)
-        assertTrue(testDouble.getRecordsOrderedBySize().first().size > 0)
+        assertTrue(testDouble.getRecordsOrderedBySize().first().isNotEmpty())
+    }
+
+    @Test
+    fun testStopRecordingWithInvalidData() = runTest{
+        val recording = Recording(
+            name = "Test Recording",
+            size = 1024,
+            file = ByteArray(0),
+            duration = 60L,
+            unixTimestamp = 1627492023L
+        )
+
+        viewModel.onEvent(RecordingEvent.StartRecording)
+        var state = viewModel.state.first()
+        assertEquals(state.isRecording, true)
+        viewModel.onEvent(RecordingEvent.StopRecording(recording))
+        state = viewModel.state.first()
+        assertEquals(state.isRecording, false)
+        assertTrue(testDouble.getRecordsOrderedBySize().first().isEmpty())
     }
 
 
