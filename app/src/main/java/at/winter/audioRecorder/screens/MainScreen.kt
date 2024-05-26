@@ -67,39 +67,21 @@ fun MainScreen(
     val recorder = remember {
         AndroidAudioRecordHandler(applicationContext)
     }
-    var recordPermissionAllowed by remember {
-        mutableStateOf(false)
-    }
     var showSnackbar by remember {
         mutableStateOf(false)
     }
-    val recordingPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-        onResult = { isGranted ->
-            Log.i(TAG, "Permission granted: $isGranted")
-            if (isGranted) {
-                onEvent(recorder.toggle(0, state.isRecording))
-            } else {
+
+    Box {
+        RecordElement(
+            recordingStarted = state.isRecording,
+            onPermissionDenied = {
                 showSnackbar = true
                 Timer().schedule(3000L) {
                     showSnackbar = false
                 }
-            }
-        }
-    )
-    Box {
-        RecordElement(
-            recordingStarted = state.isRecording,
+            },
             onClick = { duration ->
-                if (duration == 0L){
-                    if (!recordPermissionAllowed){
-                        recordingPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
-                    } else {
-                        onEvent(recorder.toggle(duration, state.isRecording))
-                    }
-                } else {
-                    onEvent(recorder.toggle(duration, state.isRecording))
-                }
+                onEvent(recorder.toggle(duration, state.isRecording))
             },
             modifier = Modifier
                 .align(Alignment.Center)
@@ -167,6 +149,7 @@ fun MainScreen(
 @Composable
 fun RecordElement(
     recordingStarted: Boolean,
+    onPermissionDenied: () -> Unit,
     onClick: (time: Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -178,7 +161,18 @@ fun RecordElement(
         if (isRecording) 0.6f else 1f
     }
 
-
+    val recordingPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            Log.i(TAG, "Permission granted: $isGranted")
+            if (isGranted) {
+                stopWatch.start()
+                onClick(stopWatch.timeMillis)
+            } else {
+                onPermissionDenied()
+            }
+        }
+    )
 
     Box(modifier = modifier) {
         AnimatedVisibility(
@@ -205,8 +199,7 @@ fun RecordElement(
                         stopWatch.reset()
                     }
                 } else {
-                    onClick(stopWatch.timeMillis)
-                    stopWatch.start()
+                    recordingPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
                 }
             },
             shape = CircleShape,
