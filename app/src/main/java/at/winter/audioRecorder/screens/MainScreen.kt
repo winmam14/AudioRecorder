@@ -1,5 +1,14 @@
 package at.winter.audioRecorder.screens
 
+import android.Manifest
+import android.app.Activity
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.spring
@@ -8,19 +17,28 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LargeFloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -38,19 +56,50 @@ import kotlin.concurrent.schedule
 private val TAG = "MainScreen"
 
 @Composable
-fun MainScreen(onOpenRecordings: () -> Unit, state: RecordingState, onEvent: (RecordingEvent) -> Unit) {
+fun MainScreen(
+    onOpenRecordings: () -> Unit,
+    state: RecordingState,
+    activity: Activity,
+    onEvent: (RecordingEvent) -> Unit
+) {
     val applicationContext = LocalContext.current
 
     val recorder = remember {
         AndroidAudioRecordHandler(applicationContext)
     }
-
+    var recordPermissionAllowed by remember {
+        mutableStateOf(false)
+    }
+    var showSnackbar by remember {
+        mutableStateOf(false)
+    }
+    val recordingPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            Log.i(TAG, "Permission granted: $isGranted")
+            if (isGranted) {
+                onEvent(recorder.toggle(0, state.isRecording))
+            } else {
+                showSnackbar = true
+                Timer().schedule(3000L) {
+                    showSnackbar = false
+                }
+            }
+        }
+    )
     Box {
-
         RecordElement(
             recordingStarted = state.isRecording,
-            onClick = {duration ->
-                onEvent(recorder.toggle(duration, state.isRecording))
+            onClick = { duration ->
+                if (duration == 0L){
+                    if (!recordPermissionAllowed){
+                        recordingPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                    } else {
+                        onEvent(recorder.toggle(duration, state.isRecording))
+                    }
+                } else {
+                    onEvent(recorder.toggle(duration, state.isRecording))
+                }
             },
             modifier = Modifier
                 .align(Alignment.Center)
@@ -69,8 +118,8 @@ fun MainScreen(onOpenRecordings: () -> Unit, state: RecordingState, onEvent: (Re
                 )
         ) {
             OutlinedButton(
-                onClick = { onOpenRecordings()
-//                    player.playFile(audioFile ?: return@OutlinedButton)
+                onClick = {
+                    onOpenRecordings()
                 }, modifier = Modifier
                     .wrapContentSize()
 
@@ -80,13 +129,47 @@ fun MainScreen(onOpenRecordings: () -> Unit, state: RecordingState, onEvent: (Re
         }
 
 
+        AnimatedVisibility(
+            visible = showSnackbar,
+            enter = scaleIn() + fadeIn(),
+            exit = scaleOut() + fadeOut(),
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(dimensionResource(id = R.dimen.outline_padding))
+        ) {
+            Snackbar(
+                modifier = Modifier.padding(
+                    vertical = dimensionResource(
+                        id = R.dimen.outline_padding
+                    )
+                )
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    Text("Please grant recording permission to use this feature ", modifier = Modifier.weight(1f))
+                    TextButton(onClick = {
+                        Intent(
+                            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                            Uri.fromParts("package", "at.winter.audioRecorder", null)
+                        ).also { activity.startActivity(it) }
+                    }) {
+                        Text("Grant Permission")
+                    }
+                }
+            }
+        }
     }
-
-
 }
 
 @Composable
-fun RecordElement(recordingStarted: Boolean, onClick: (time: Long) -> Unit, modifier: Modifier = Modifier) {
+fun RecordElement(
+    recordingStarted: Boolean,
+    onClick: (time: Long) -> Unit,
+    modifier: Modifier = Modifier
+) {
     val stopWatch = remember { StopWatch() }
     val transition = updateTransition(targetState = recordingStarted, label = "boxTransition")
     val scale by transition.animateFloat(

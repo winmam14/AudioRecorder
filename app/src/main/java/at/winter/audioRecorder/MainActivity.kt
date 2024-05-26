@@ -40,7 +40,6 @@ class MainActivity : ComponentActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO), 0)
         super.onCreate(savedInstanceState)
         setContent {
             AudioRecorderTheme {
@@ -49,7 +48,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize()
                 ) {
                     val state by viewModel.state.collectAsState()
-                    Navigation(state = state, onEvent = viewModel::onEvent)
+                    Navigation(state = state, onEvent = viewModel::onEvent, activity = this)
                 }
             }
         }
