@@ -1,6 +1,7 @@
 # Documentation Audio Recorder
 
-![MainScreen](MainScreen.png)
+![MainScreen](MainScreen.png)  
+
 ![RecordingsScreen](RecordingsScreen.png)
 
 ## Package: `at.winter.audioRecorder`
