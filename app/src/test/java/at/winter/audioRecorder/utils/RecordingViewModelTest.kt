@@ -20,10 +20,6 @@ class RecordingViewModelTest{
     @OptIn(ExperimentalCoroutinesApi::class)
     private var dispatcher = UnconfinedTestDispatcher()
 
-    @get:Rule
-    var rule: TestRule = InstantTaskExecutorRule()
-
-
     @Before
     fun setUp(){
         testDouble = RecordingDaoTestDouble()
