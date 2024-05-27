@@ -3,7 +3,6 @@ package at.winter.audioRecorder.utils
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import at.winter.audioRecorder.data.Recording
 import at.winter.audioRecorder.data.RecordingDaoTestDouble
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.*
@@ -14,40 +13,41 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestRule
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class RecordingViewModelTest{
 
     private lateinit var viewModel: RecordingViewModel
     private lateinit var testDouble: RecordingDaoTestDouble
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private var dispatcher = UnconfinedTestDispatcher()
 
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
 
+
     @Before
     fun setUp(){
-        Dispatchers.setMain(UnconfinedTestDispatcher())
         testDouble = RecordingDaoTestDouble()
-        viewModel = RecordingViewModel(testDouble)
+        viewModel = RecordingViewModel(testDouble, dispatcher)
     }
 
     @After
     fun tearDown() {
-        Dispatchers.resetMain()
     }
 
     @Test
-    fun testSortRecordingsUodatesSortTye() = runTest{
+    fun testSortRecordingsUpdatesSortType() = runTest(dispatcher) {
             val initialState = viewModel.state.first()
 
             viewModel.onEvent(RecordingEvent.SortRecordings(SortType.FILE_SIZE))
 
             val updatedState = viewModel.state.first()
+
             assertNotEquals(initialState.sortType, updatedState.sortType)
             assertEquals(updatedState.sortType,SortType.FILE_SIZE)
     }
 
     @Test
-    fun testStopRecording() = runTest{
+    fun testStopRecording() = runTest(dispatcher){
         val recording = Recording(
             name = "Test Recording",
             size = 1024,
@@ -58,15 +58,17 @@ class RecordingViewModelTest{
 
         viewModel.onEvent(RecordingEvent.StartRecording)
         var state = viewModel.state.first()
+
         assertEquals(state.isRecording, true)
         viewModel.onEvent(RecordingEvent.StopRecording(recording))
         state = viewModel.state.first()
+
         assertEquals(state.isRecording, false)
         assertTrue(testDouble.getRecordsOrderedBySize().first().isNotEmpty())
     }
 
     @Test
-    fun testStopRecordingWithInvalidData() = runTest{
+    fun testStopRecordingWithInvalidData() = runTest(dispatcher){
         val recording = Recording(
             name = "Test Recording",
             size = 1024,
@@ -77,9 +79,11 @@ class RecordingViewModelTest{
 
         viewModel.onEvent(RecordingEvent.StartRecording)
         var state = viewModel.state.first()
+
         assertEquals(state.isRecording, true)
         viewModel.onEvent(RecordingEvent.StopRecording(recording))
         state = viewModel.state.first()
+
         assertEquals(state.isRecording, false)
         assertTrue(testDouble.getRecordsOrderedBySize().first().isEmpty())
     }
