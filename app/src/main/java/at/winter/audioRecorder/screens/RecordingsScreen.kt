@@ -1,5 +1,7 @@
 package at.winter.audioRecorder.screens
 
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -38,11 +40,10 @@ import at.winter.audioRecorder.utils.SortType
 @Composable
 fun RecordingsScreen(state: RecordingState, onEvent: (RecordingEvent) -> Unit) {
     val applicationContext = LocalContext.current
-
+    val context = LocalContext.current
     val audioPlayer = remember {
         AndroidAudioPlayerHandler(applicationContext)
     }
-
 
     LazyColumn(
         contentPadding = PaddingValues(dimensionResource(id = R.dimen.medium_padding)),

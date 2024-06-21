@@ -13,27 +13,32 @@ class AndroidAudioRecordHandler(private var applicationContext: Context) {
     private var file: File? = null
 
     fun toggle(durationMs: Long, isRecording: Boolean): RecordingEvent {
-        if (isRecording) {
-            Log.i(TAG, "Stop Recording...")
-            recorder.stop()
-            return if (file != null) {
-                val recording = Recording(
-                    name = file!!.nameWithoutExtension,
-                    size = file!!.readBytes().size,
-                    file = file!!.readBytes(),
-                    duration = durationMs,
-                    unixTimestamp = System.currentTimeMillis()
-                )
-                file!!.delete()
-                RecordingEvent.StopRecording(recording)
+        try {
+            if (isRecording) {
+                Log.i(TAG, "Stop Recording...")
+                recorder.stop()
+                return if (file != null) {
+                    val recording = Recording(
+                        name = file!!.nameWithoutExtension,
+                        size = file!!.readBytes().size,
+                        file = file!!.readBytes(),
+                        duration = durationMs,
+                        unixTimestamp = System.currentTimeMillis()
+                    )
+                    file!!.delete()
+                    RecordingEvent.StopRecording(recording)
+                } else {
+                    RecordingEvent.StopRecording(Recording("", 0, ByteArray(0), 0L, 0L))
+                }
             } else {
-                RecordingEvent.StopRecording(Recording("", 0, ByteArray(0), 0L, 0L))
+                Log.i(TAG, "Start Recording...")
+                file = createFile()
+                recorder.start(file!!)
+                return RecordingEvent.StartRecording
             }
-        } else {
-            Log.i(TAG, "Start Recording...")
-            file = createFile()
-            recorder.start(file!!)
-            return RecordingEvent.StartRecording
+        }catch (ex: Exception){
+            Log.e("Toggle", ex.toString())
+            return RecordingEvent.StopRecording(Recording("",0, ByteArray(0),0L,0L,0))
         }
     }
 

@@ -4,7 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import at.winter.audioRecorder.data.Recording
 import at.winter.audioRecorder.data.RecordingDao
+import at.winter.audioRecorder.data.remote.JokeApi
+import at.winter.audioRecorder.data.remote.RemoteRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -12,6 +16,8 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 private val TAG = "RecordingViewModel"
 
@@ -40,6 +46,29 @@ class RecordingViewModel(
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), RecordingState())
 
+
+    init {
+        var joke = ""
+        viewModelScope.launch(Dispatchers.IO) {
+            do {
+                val remoteData = RemoteRepository(
+                    client = Retrofit.Builder()
+                        .baseUrl("https://api.chucknorris.io/")
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build()
+                        .create(JokeApi::class.java)
+                )
+
+                joke = async {
+                    remoteData.getJoke()
+                }.await()
+            } while (joke.length > 80)
+            _state.update { it.copy(
+                joke = joke
+            ) }
+        }
+    }
+
     fun onEvent(event: RecordingEvent){
         when(event){
             is RecordingEvent.SortRecordings -> {
@@ -53,7 +82,7 @@ class RecordingViewModel(
                 val duration = event.recording.duration
                 val unixTimestamp = event.recording.unixTimestamp
 
-                if (name.isBlank() || size < 0 || file.isEmpty() || duration <= 0 || unixTimestamp <= 0){
+                if (name.isEmpty() || size < 0 || file.isEmpty() || duration <= 0 || unixTimestamp <= 0){
                     _state.update { it.copy(
                         isRecording = false
                     ) }

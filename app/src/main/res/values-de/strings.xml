@@ -14,4 +14,6 @@
     <string name="recording_item_attribute_date">Datum:</string>
     <string name="order_by">Sortieren:</string>
     <string name="main_screen_title">Starte eine Aufnahme!</string>
+    <string name="warning">Um zu navigieren, stoppe zuerst die Aufnahme!</string>
+    <string name="tab_to_start">Tippe um mit dem Aufnehmen zu beginnen</string>
 </resources>

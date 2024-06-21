@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "at.winter.audioRecorder"
-        minSdk = 24
+        minSdk = 31
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -74,4 +74,9 @@ dependencies {
     implementation("androidx.room:room-ktx:$roomVersion")
     ksp("androidx.room:room-compiler:$roomVersion")
     implementation("androidx.compose.ui:ui-text-google-fonts:1.6.7")
+
+    // Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.5.0")
 }

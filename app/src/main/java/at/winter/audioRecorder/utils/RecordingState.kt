@@ -12,5 +12,6 @@ data class RecordingState (
     val isRecording: Boolean = false,
     val isReplaying: Boolean = false,
     val currentRecording: Int = 0,
-    val sortType: SortType = SortType.TIMESTAMP_DESC
+    val sortType: SortType = SortType.TIMESTAMP_DESC,
+    val joke: String = ""
 )

@@ -6,6 +6,8 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
 import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -61,12 +63,22 @@ fun MainScreen(
     onEvent: (RecordingEvent) -> Unit
 ) {
     val applicationContext = LocalContext.current
-
+    val context = LocalContext.current
     val recorder = remember {
         AndroidAudioRecordHandler(applicationContext)
     }
     var showSnackbar by remember {
         mutableStateOf(false)
+    }
+
+    if (state.isRecording) {
+        BackHandler {
+            Toast.makeText(
+                context,
+                context.getString(R.string.warning),
+                Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 
 
