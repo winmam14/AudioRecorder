@@ -1,5 +1,7 @@
 # Documentation Audio Recorder
 
+![LandingPage](LandingPage.png)
+
 ![MainScreen](MainScreen.png)  
 
 ![RecordingsScreen](RecordingsScreen.png)
