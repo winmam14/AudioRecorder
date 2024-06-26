@@ -6,6 +6,8 @@ import at.winter.audioRecorder.data.Recording
 import at.winter.audioRecorder.data.RecordingDao
 import at.winter.audioRecorder.data.remote.JokeApi
 import at.winter.audioRecorder.data.remote.RemoteRepository
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
@@ -22,8 +24,11 @@ import retrofit2.converter.gson.GsonConverterFactory
 private val TAG = "RecordingViewModel"
 
 class RecordingViewModel(
-    private val dao: RecordingDao
+    private val dao: RecordingDao,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ): ViewModel(){
+
+    private val scope = if (ioDispatcher != Dispatchers.IO) CoroutineScope(ioDispatcher) else viewModelScope
     private val sortType = MutableStateFlow(SortType.TIMESTAMP_DESC)
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -35,7 +40,7 @@ class RecordingViewModel(
                 SortType.FILE_SIZE -> dao.getRecordsOrderedBySize()
             }
         }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+        .stateIn(scope, SharingStarted.WhileSubscribed(), emptyList())
     private val _state = MutableStateFlow(RecordingState())
 
     val state = combine(_state, sortType, recordings){ state, sortType, contacts ->
@@ -44,7 +49,7 @@ class RecordingViewModel(
             sortType = sortType
 
         )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), RecordingState())
+    }.stateIn(scope, SharingStarted.WhileSubscribed(5000), RecordingState())
 
 
     init {
@@ -96,7 +101,7 @@ class RecordingViewModel(
                     unixTimestamp = unixTimestamp
                 )
 
-                viewModelScope.launch {
+                scope.launch {
                     dao.insertRecording(recording)
                 }
 
@@ -107,7 +112,7 @@ class RecordingViewModel(
             }
 
             is RecordingEvent.DeleteRecording -> {
-                viewModelScope.launch {
+                scope.launch {
                     dao.deleteRecord(event.recording)
                 }
             }

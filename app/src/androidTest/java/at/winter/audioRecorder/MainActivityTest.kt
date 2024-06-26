@@ -15,7 +15,7 @@ import org.junit.Test
 class MainActivityTest{
 
     @get:Rule val composeTestRule = createAndroidComposeRule<MainActivity>()
-    
+
     @OptIn(ExperimentalTestApi::class)
     @Test
     fun RecordButtonTest(){

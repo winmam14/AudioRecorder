@@ -1,5 +1,9 @@
 # Documentation Audio Recorder
 
+![MainScreen](MainScreen.png)  
+
+![RecordingsScreen](RecordingsScreen.png)
+
 ## Package: `at.winter.audioRecorder`
 
 ### Class: `MainActivity`
