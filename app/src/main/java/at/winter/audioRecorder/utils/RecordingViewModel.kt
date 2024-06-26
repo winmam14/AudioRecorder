@@ -50,15 +50,14 @@ class RecordingViewModel(
     init {
         var joke = ""
         viewModelScope.launch(Dispatchers.IO) {
+            val remoteData = RemoteRepository(
+                client = Retrofit.Builder()
+                    .baseUrl("https://api.chucknorris.io/")
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build()
+                    .create(JokeApi::class.java)
+            )
             do {
-                val remoteData = RemoteRepository(
-                    client = Retrofit.Builder()
-                        .baseUrl("https://api.chucknorris.io/")
-                        .addConverterFactory(GsonConverterFactory.create())
-                        .build()
-                        .create(JokeApi::class.java)
-                )
-
                 joke = async {
                     remoteData.getJoke()
                 }.await()

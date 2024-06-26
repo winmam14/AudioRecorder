@@ -8,3 +8,4 @@ interface JokeApi {
     @GET("jokes/random")
     suspend fun makeRequest(): Response<Joke>
 }
+
