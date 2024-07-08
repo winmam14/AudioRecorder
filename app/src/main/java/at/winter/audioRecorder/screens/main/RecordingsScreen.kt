@@ -1,7 +1,5 @@
-package at.winter.audioRecorder.screens
+package at.winter.audioRecorder.screens.main
 
-import android.widget.Toast
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement

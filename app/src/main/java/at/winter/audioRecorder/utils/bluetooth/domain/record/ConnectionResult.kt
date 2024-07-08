@@ -1,4 +1,6 @@
 package at.winter.audioRecorder.utils.bluetooth.domain.record
 
-interface ConnectionResult {
+sealed interface ConnectionResult {
+    object ConnectionEstablished: ConnectionResult
+    data class Error(val message: String): ConnectionResult
 }

@@ -15,7 +15,7 @@ import androidx.room.Room
 import at.winter.audioRecorder.data.RecordingDatabase
 import at.winter.audioRecorder.navigation.Navigation
 import at.winter.audioRecorder.ui.theme.AudioRecorderTheme
-import at.winter.audioRecorder.utils.RecordingViewModel
+import at.winter.audioRecorder.viewModels.RecordingViewModel
 
 class MainActivity : ComponentActivity() {
 

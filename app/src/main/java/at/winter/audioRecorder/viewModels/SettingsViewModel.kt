@@ -1,4 +1,9 @@
 package at.winter.audioRecorder.viewModels
 
-class SettingsViewModel {
+import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+
+class SettingsViewModel: ViewModel() {
+    val state = MutableStateFlow(SettingsState())
+
 }

@@ -1,3 +1,8 @@
 package at.winter.audioRecorder.utils.bluetooth.domain.record
 
-data class BluetoothDevice()
+typealias BluetoothDeviceDomain = BluetoothDevice
+
+data class BluetoothDevice(
+    val name: String?,
+    val address: String
+)

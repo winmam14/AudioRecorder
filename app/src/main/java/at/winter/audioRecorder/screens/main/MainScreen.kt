@@ -1,4 +1,4 @@
-package at.winter.audioRecorder.screens
+package at.winter.audioRecorder.screens.main
 
 import android.Manifest
 import android.app.Activity
@@ -27,7 +27,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -63,7 +62,11 @@ private val TAG = "MainScreen"
 
 @Composable
 fun MainScreen(
-    onOpenRecordings: () -> Unit, state: RecordingState, activity: Activity, onEvent: (RecordingEvent) -> Unit
+    onOpenRecordings: () -> Unit,
+    onOpenSettings: () -> Unit,
+    state: RecordingState,
+    activity: Activity,
+    onEvent: (RecordingEvent) -> Unit
 ) {
     val applicationContext = LocalContext.current
     val context = LocalContext.current
@@ -93,7 +96,7 @@ fun MainScreen(
         ) {
 
             IconButton(onClick = {
-
+                onOpenSettings()
             }) {
                 Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Settings", modifier = Modifier.size(32.dp))
             }

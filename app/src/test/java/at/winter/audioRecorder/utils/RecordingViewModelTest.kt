@@ -1,17 +1,15 @@
 package at.winter.audioRecorder.utils
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import at.winter.audioRecorder.data.Recording
 import at.winter.audioRecorder.data.RecordingDaoTestDouble
+import at.winter.audioRecorder.viewModels.RecordingViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.*
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.TestRule
 
 class RecordingViewModelTest{
 
