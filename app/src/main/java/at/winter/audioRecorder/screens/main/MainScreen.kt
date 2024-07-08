@@ -20,12 +20,17 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeFloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -45,6 +50,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import at.winter.audioRecorder.R
 import at.winter.audioRecorder.utils.AudioRecorder.AndroidAudioRecordHandler
 import at.winter.audioRecorder.utils.RecordingEvent
@@ -57,10 +63,7 @@ private val TAG = "MainScreen"
 
 @Composable
 fun MainScreen(
-    onOpenRecordings: () -> Unit,
-    state: RecordingState,
-    activity: Activity,
-    onEvent: (RecordingEvent) -> Unit
+    onOpenRecordings: () -> Unit, state: RecordingState, activity: Activity, onEvent: (RecordingEvent) -> Unit
 ) {
     val applicationContext = LocalContext.current
     val context = LocalContext.current
@@ -74,9 +77,7 @@ fun MainScreen(
     if (state.isRecording) {
         BackHandler {
             Toast.makeText(
-                context,
-                context.getString(R.string.warning),
-                Toast.LENGTH_SHORT
+                context, context.getString(R.string.warning), Toast.LENGTH_SHORT
             ).show()
         }
     }
@@ -84,11 +85,22 @@ fun MainScreen(
 
     Box {
 
+        // settings
         AnimatedVisibility(
-            visible = !state.isRecording,
-            enter = scaleIn() + fadeIn(),
-            exit = scaleOut() + fadeOut(),
-            modifier = Modifier
+            visible = !state.isRecording, enter = scaleIn() + fadeIn(), exit = scaleOut() + fadeOut(), modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(dimensionResource(id = R.dimen.outline_padding))
+        ) {
+
+            IconButton(onClick = {
+
+            }) {
+                Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Settings", modifier = Modifier.size(32.dp))
+            }
+        }
+
+        AnimatedVisibility(
+            visible = !state.isRecording, enter = scaleIn() + fadeIn(), exit = scaleOut() + fadeOut(), modifier = Modifier
                 .align(Alignment.Center)
                 .padding(
                     bottom = dimensionResource(id = R.dimen.record_button_size) + dimensionResource(
@@ -99,26 +111,18 @@ fun MainScreen(
             Text(stringResource(id = R.string.main_screen_title), style = MaterialTheme.typography.displaySmall, textAlign = TextAlign.Center)
         }
 
-        RecordElement(
-            recordingStarted = state.isRecording,
-            onPermissionDenied = {
-                showSnackbar = true
-                Timer().schedule(3000L) {
-                    showSnackbar = false
-                }
-            },
-            onClick = { duration ->
-                onEvent(recorder.toggle(duration, state.isRecording))
-            },
-            modifier = Modifier
-                .align(Alignment.Center)
+        RecordElement(recordingStarted = state.isRecording, onPermissionDenied = {
+            showSnackbar = true
+            Timer().schedule(3000L) {
+                showSnackbar = false
+            }
+        }, onClick = { duration ->
+            onEvent(recorder.toggle(duration, state.isRecording))
+        }, modifier = Modifier.align(Alignment.Center)
         )
 
         AnimatedVisibility(
-            visible = !state.isRecording,
-            enter = scaleIn() + fadeIn(),
-            exit = scaleOut() + fadeOut(),
-            modifier = Modifier
+            visible = !state.isRecording, enter = scaleIn() + fadeIn(), exit = scaleOut() + fadeOut(), modifier = Modifier
                 .align(Alignment.Center)
                 .padding(
                     top = dimensionResource(id = R.dimen.record_button_size) + dimensionResource(
@@ -129,8 +133,7 @@ fun MainScreen(
             OutlinedButton(
                 onClick = {
                     onOpenRecordings()
-                }, modifier = Modifier
-                    .wrapContentSize()
+                }, modifier = Modifier.wrapContentSize()
 
             ) {
                 Text(stringResource(id = R.string.show_recordings), style = MaterialTheme.typography.labelLarge)
@@ -139,10 +142,7 @@ fun MainScreen(
 
 
         AnimatedVisibility(
-            visible = showSnackbar,
-            enter = scaleIn() + fadeIn(),
-            exit = scaleOut() + fadeOut(),
-            modifier = Modifier
+            visible = showSnackbar, enter = scaleIn() + fadeIn(), exit = scaleOut() + fadeOut(), modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(dimensionResource(id = R.dimen.outline_padding))
         ) {
@@ -154,15 +154,12 @@ fun MainScreen(
                 )
             ) {
                 Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
+                    verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(stringResource(id = R.string.permission_snackbar), modifier = Modifier.weight(1f))
                     TextButton(onClick = {
                         Intent(
-                            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                            Uri.fromParts("package", "at.winter.audioRecorder", null)
+                            Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", "at.winter.audioRecorder", null)
                         ).also { activity.startActivity(it) }
                     }) {
                         Text(stringResource(id = R.string.grant_permission))
@@ -175,10 +172,7 @@ fun MainScreen(
 
 @Composable
 fun RecordElement(
-    recordingStarted: Boolean,
-    onPermissionDenied: () -> Unit,
-    onClick: (time: Long) -> Unit,
-    modifier: Modifier = Modifier
+    recordingStarted: Boolean, onPermissionDenied: () -> Unit, onClick: (time: Long) -> Unit, modifier: Modifier = Modifier
 ) {
     val stopWatch = remember { StopWatch() }
     val transition = updateTransition(targetState = recordingStarted, label = "boxTransition")
@@ -190,28 +184,22 @@ fun RecordElement(
     var recordPermissionAllowed by remember {
         mutableStateOf(false)
     }
-    val recordingPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-        onResult = { isGranted ->
-            recordPermissionAllowed = isGranted
-            Log.i(TAG, "Permission granted: $isGranted")
-            if (isGranted) {
-                stopWatch.start()
-                onClick(stopWatch.timeMillis)
-            } else {
-                onPermissionDenied()
-            }
+    val recordingPermissionLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.RequestPermission(), onResult = { isGranted ->
+        recordPermissionAllowed = isGranted
+        Log.i(TAG, "Permission granted: $isGranted")
+        if (isGranted) {
+            stopWatch.start()
+            onClick(stopWatch.timeMillis)
+        } else {
+            onPermissionDenied()
         }
-    )
+    })
 
 
 
-    Box(modifier = modifier) {
+    Box(modifier = modifier.fillMaxSize()) {
         AnimatedVisibility(
-            visible = recordingStarted,
-            enter = scaleIn() + fadeIn(),
-            exit = scaleOut() + fadeOut(),
-            modifier = Modifier
+            visible = recordingStarted, enter = scaleIn() + fadeIn(), exit = scaleOut() + fadeOut(), modifier = Modifier
                 .align(Alignment.Center)
                 .padding(
                     bottom = dimensionResource(id = R.dimen.record_button_size) + dimensionResource(
@@ -231,24 +219,20 @@ fun RecordElement(
                         stopWatch.reset()
                     }
                 } else {
-                    if (!recordPermissionAllowed){
+                    if (!recordPermissionAllowed) {
                         recordingPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
                     } else {
                         stopWatch.start()
                         onClick(stopWatch.timeMillis)
                     }
                 }
-            },
-            shape = CircleShape,
-            modifier = modifier
+            }, shape = CircleShape, modifier = modifier
                 .size(dimensionResource(id = R.dimen.record_button_size))
                 .scale(scale)
                 .align(Alignment.Center)
         ) {
             Icon(
-                painterResource(id = R.drawable.record_icon),
-                "Record Button",
-                modifier = Modifier.size(
+                painterResource(id = R.drawable.record_icon), "Record Button", modifier = Modifier.size(
                     dimensionResource(id = R.dimen.record_button_icon_size)
                 )
             )
